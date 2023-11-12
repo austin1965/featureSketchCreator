@@ -1,14 +1,24 @@
 package com.featuresketch.featuresketchcreator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@Slf4j
 public class FeatureSketchCreatorApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FeatureSketchCreatorApplication.class, args);
-		System.out.println("test");
+		FileParser fileParser = new FileParser();
+
+		try {
+			fileParser.parseFile();
+		}
+		catch(Exception e) {
+			log.error(e.getMessage());
+		}
+
 	}
 
 }
