@@ -25,6 +25,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileParser {
     private static final String FILE_PATH = "src/main/java/org/javaparser/samples/ReversePolishNotation.java";
@@ -41,20 +42,15 @@ public class FileParser {
         StaticJavaParser.getParserConfiguration().setSymbolResolver(symbolSolver);
         CompilationUnit cu = StaticJavaParser.parse(Files.newInputStream(Paths.get(FILE_PATH)));
 
-        List<FieldDeclaration> fields = cu.findAll(FieldDeclaration.class);
-        List<NameExpr> nameExpressions = cu.findAll(NameExpr.class);
+        List<String> fields = cu.findAll(FieldDeclaration.class).stream().map(s -> s.resolve().getName()).toList();
+        List<String> nameExpressions = cu.findAll(NameExpr.class).stream().map(s -> s.getName().toString()).toList();
 
-        YamlPrinter printer = new YamlPrinter(true);
-        for(NameExpr nameExpr: nameExpressions) {
-//            System.out.println(printer.output(nameExpr));
-            System.out.println(nameExpr.getName());
-            if(!nameExpr.getName().toString().equals("Stream")) {
-                 if(nameExpr.isClassExpr()) {
-                     System.out.println("FOUND");
-                 }
-
+        for (String name: nameExpressions) {
+            if (fields.contains(name)) {
+                System.out.println("FOUND " + name);
             }
         }
+
 
 //        for(FieldDeclaration fieldDeclaration: fields) {
 //            fieldList.add(fieldDeclaration.resolve().getName());
@@ -65,8 +61,6 @@ public class FileParser {
 
 //        VoidVisitor<List<String>> classVisitor = new ClassPrinter();
 //        classVisitor.visit(cu, fieldList);
-//        YamlPrinter printer = new YamlPrinter(true);
-//        System.out.println(printer.output(cu));
 
 //        VoidVisitor<List<String>> fieldDeclarationVisitor = new FieldDeclarationPrinter();
 //        fieldDeclarationVisitor.visit(cu, fieldList);

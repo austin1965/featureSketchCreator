@@ -69,7 +69,7 @@ public class ReversePolishNotation {
      * Memory Clear sets the memory to 0.
      */
     public void memoryClear(){
-        this.memory = 0;
+        memory = 0;
     }
 
 
