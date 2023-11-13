@@ -1,20 +1,20 @@
-package com.featuresketch.featuresketchcreator;
+package com.featuresketch.featuresketchcreator.experimenting;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.*;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.printer.DotPrinter;
 import com.github.javaparser.printer.YamlPrinter;
 import com.github.javaparser.resolution.Navigator;
 import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.contexts.ClassOrInterfaceDeclarationContext;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 public class FileParser {
     private static final String FILE_PATH = "src/main/java/org/javaparser/samples/ReversePolishNotation.java";
+
+
     private static final String SRC_PATH = "src/main/java/org/javaparser/samples/";
     private List<String> fieldList = new ArrayList<>();
     private Map<String, Map<String, Integer>> usage = new HashMap<>();
@@ -44,12 +46,36 @@ public class FileParser {
 
         List<String> fields = cu.findAll(FieldDeclaration.class).stream().map(s -> s.resolve().getName()).toList();
         List<String> nameExpressions = cu.findAll(NameExpr.class).stream().map(s -> s.getName().toString()).toList();
+        List<MethodDeclaration> methods = cu.findAll(MethodDeclaration.class);
 
-        for (String name: nameExpressions) {
-            if (fields.contains(name)) {
-                System.out.println("FOUND " + name);
+        ResolvedMethodDeclaration resolvedMethod = methods.get(0).resolve();
+        DotPrinter printer = new DotPrinter(true);
+        System.out.println(printer.output(cu));
+
+        for (NameExpr nameExpr: cu.findAll(NameExpr.class)) {
+            System.out.println("Current node: " + nameExpr.getName());
+            System.out.println("Desribed: " + nameExpr.getSymbolResolver().calculateType(nameExpr).describe());
+            ResolvedType type = nameExpr.getSymbolResolver().calculateType(nameExpr);
+            Optional<VariableDeclarator> test = Navigator.demandVariableDeclaration(nameExpr, nameExpr.getName().asString());
+            System.out.println("Declaration: "+ (test.isPresent() ? test.get() : "Unavailable"));
+            System.out.println();
+
+            VariableDeclarator variableDeclarator = new VariableDeclarator();
+            variableDeclarator.getInitializer();
+            if(nameExpr.getName().toString().equals("memory")) {
+                System.out.println("here");
             }
+
         }
+
+
+
+
+//        for (String name: nameExpressions) {
+//            if (fields.contains(name)) {
+//                System.out.println("FOUND " + name);
+//            }
+//        }
 
 
 //        for(FieldDeclaration fieldDeclaration: fields) {
